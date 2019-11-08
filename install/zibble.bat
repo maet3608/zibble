@@ -1,0 +1,1 @@
+javaw -mx600M -cp "zibble.jar;scala-library.jar" quuux.zibble.Zibble %1

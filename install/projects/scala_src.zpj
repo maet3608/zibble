@@ -1,0 +1,9 @@
+VAR {dest} {USB 500GB}/backup/Work      
+
+PROJECT
+  NAME Scala
+  FROM c:/Maet/Projects/Scala
+  TO {dest}/scala.zip
+  INCLUDE /*, *.scala
+  EXCLUDE /.*, /libs
+ 

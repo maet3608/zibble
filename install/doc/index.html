@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+  <head>
+    <link rev="made" href="mailto:s.maetschke@uq.edu.au">
+    <title>Zibble</title>
+    <link type="text/css" rel="stylesheet" href="style.css">
+  </head>
+
+<body>
+
+
+
+<!-- ================================================================================ -->
+<center><h1 style="font-size:300%;">Zibble</h1></center>
+
+
+<!-- ================================================================================ -->
+<h1>contents</h1>
+
+<ul>
+  <li><a href="#introduction">introduction</a></li>
+  <li><a href="#installation">installation</a></li>
+  <li><a href="#usage">usage</a></li>
+  <li><a href="#problems">known problems</a></li>
+  <li><a href="#history">version history</a></li>
+ 
+</ul>
+
+
+<!-- ================================================================================ -->
+<h1><a name="introduction">introduction</a></h1>
+
+<p>
+<b>Zibble</b> is a backup software that stores files in zip archives. It uses patterns (regular expressions) to specifiy files and folders to include in or to exclude from the backup.
+</p>
+
+
+<!-- ================================================================================ -->
+<h1><a name="installation">Installation</a></h1>
+
+<p><b>Zibble</b> is written in <a href="http://www.scala-lang.org/">Scala</a> 2.8. It runs on all platforms that support the Java Runtime Environment 1.6.x or higher (tested only for Windows XP/7 but should work under Unix and Mac as well).
+</p><p>
+To check, which version of the JRE installed on your system open a shell and type
+<pre>java -version</pre>
+</p><p>
+The output should look similar to this:
+</p>
+<pre>
+java version "1.6.0_21"
+Java(TM) SE Runtime Environment (build 1.6.0_21-b06)
+Java HotSpot(TM) 64-Bit Server VM (build 17.0-b16, mixed mode)
+</pre>
+<p>
+The Java runtime environment can be downloaded at:
+<a href="http://java.sun.com/products/archive/">http://java.sun.com/products/archive/</a>
+</p>
+<p>
+The installation of <b>Zibble</b> itself is simple. Just copy/unzip all files to a folder of your choice. To run <b>Zibble</b> call zibble.bat under Windows or zibble.sh under Unix.
+Alternatively execute the following command line
+</p>
+<pre>
+java -mx600M -cp "zibble.jar;scala-library.jar" zibble.Zibble project_file
+</pre>
+<p>
+The option -mx specifies the amount of memory reserved for the execution of Zibble, e.g. -mx600M = 600 Mega Bytes. It is not necessary to specify the reserved memory in advance, however an "out of memory" error might occur if there is not enough memory. 
+</p>
+<p>
+project_file is the path to a Zibble projects file. Details see below.
+</p>
+
+
+
+<!-- ================================================================================ -->
+<h1><a name="usage">usage</a></h1>
+
+<p>
+<b>Zibble</b> is started from the command line by calling zibble.bat with a zibble projects file
+</p>
+<pre>
+zibble.bat project_file
+</pre>
+<p>
+For instance, the following command line call would run a backup project file named "mydocuments.zpj". Zibble projects typically use the file extension "zpj" but this is not a must.
+</p>
+<pre>
+  zibble.bat mydocuments.zpj
+</pre>
+<p>Note that every run of <b>Zibble</b> creates a log file zibble.log in the same directory Zibble is started from. It states which files have been archived and whether errors have occured.</p>
+
+<p>
+Backup projects are defined by variables and properties such as NAME, FROM, or TO. Here an example of a zibble projects file that contains a variable definition and two backup projects. 
+</p>
+
+<pre>
+# An example of a projects file
+VAR {dest} d:/backups
+
+PROJECT
+  NAME java
+  FROM c:/projects/java
+  TO {dest}/java.zip
+
+PROJECT
+  NAME text
+  FROM c:/user/text, d:/docs
+  TO {dest}/text.zip
+  INCLUDE /*, *.txt
+  EXCLUDE /te@mp, ^[.~]*
+</pre>  
+  
+<p>
+The following section describes the properties that define a backup project. Properties can be used in arbitrary order and if a property is not provided the corresponding default value is used. Multiple values for a property MUST be separated by ","! If the same property is defined multiple times the last definition overrides previous ones. Note that property values cannot be written over multiple lines and each property has to be defined in a separate line. Indentation is not required but it is good practice to indent property definitions by two spaces.
+</p>
+
+<p><b>NAME</b> Name of the project. Cannot contain whitespaces but underbar is fine. Default is "project" but is not recommended. Good practice is to pick the same name for the project and the backup file, e.g.
+<pre>
+PROJECT
+  NAME documents
+  TO c:/backup/documents.zip
+</pre></p>
+
+<p><b>RUN</b>  Schedule of the project. Currently only "now" or "never" are permitted. Default is "now", which means the project is excecuted everytime <b>Zibble</b> runs. "never" deactivates a project. <pre>RUN never</pre></p>
+
+<p><b>FROM</b> Source folders to scan for files to backup. Default is ".". If more than one source folder is provided the folder names must be separated by ",", e.g. 
+<pre>FROM c:/user/text, d:/mydocs</pre>
+</p><p>
+Source folders are not required to exist. This allows to run the same backup script on different computers where files are stored under different locations or to backup from media that are not necessarily available at backup time (e.g. USB or network drives), without resulting in error messages.
+</p>
+
+<p><b>TO</b> Target archive files to write the backup to. The format is zip and the default path is "backup.zip". More than one backup target can be defined and all targets will contain the same data. Useful when a local backup and a remote backup are required:
+<pre>TO c:/user/backup/backup.zip, {My USB}/backups/data.zip </pre></p>
+
+<p><b>INCLUDE</b> Patterns of files or folders to include within the backup. Default is "*", which means all folders, subfolders and contained files at the source locations (FROM) are included. Patterns are described by modified regular expressions (see below) and folder patters are indicated by a "/" as prefix. Here some examples:
+<pre>INCLUDE *                            #all files in all folders and subfolders of source folders
+INCLUDE /*, *.txt                    #all text files in all folders and subfolders of source folders
+INCLUDE *.txt                        #all text files in source folder but not subfolders
+INCLUDE /text,/doc, *.txt,*.doc      #all *.txt and *.doc in paths that contain /text or /doc
+INCLUDE /text/latex                  #all files in path that contain the subpath /text/latex
+</pre></p>
+
+<p><b>EXCLUDE</b> Patterns of files or folders to exclude from the backup. Default is "", which means no files are excluded:
+<pre>EXCLUDE *.zip                         #no zip files
+EXCLUDE /bin,/out, *.class            #no bin or out folders or class files
+EXCLUDE /te@mp, [~.]*                 #no temp or tmp folders or files that start with ~ or .
+</pre>
+</p><p>
+Exclude patterns override include patterns. For instance no files are archived in the following case:
+<pre>INCLUDE /*, *.txt                     #all text files in all folders and subfolders
+EXCLUDE *                             #exclude all files and folders
+</pre></p>
+
+<p><b>COMPRESS</b> Level of compression [0-9]. Default is 9, which indicates the highest compression but also takes the longest time.
+<pre>COMPRESS 0 </pre></p>
+
+<p><b>VERBOSE</b> Level of verbosity [0,1]. Default is 0, indicating reduced console output. Log file is still written.
+<pre>VERBOSE 1 </pre></p>
+
+<p><b>SIMULATE</b> Simulation mode. Has to be 'on" or "off". Default is "off". When activated it executes the backup project and scans all files but does not create or overwrite a backup archive. Useful to test a project before actually running it.
+<pre>SIMULATE on </pre></p>
+
+
+<p><b>VAR</b> Starts a variable definition. Variable names must be wrapped in curly brackets {}
+for definition and usage. Variables can be used within variable definitions and any other property value. Here an example:
+</p>
+<pre>
+VAR {temppat} ^[.~]*, *.te@mp, /te@mp     #pattern for temp files
+VAR {dest} c:/backup                      #destination for backup  
+PROJECT
+  NAME docs
+  FROM d:/user/documents 
+  TO {dest}/docs.zip 
+  EXCLUDE {temppat}, *.zip  
+PROJECT
+  NAME java
+  FROM d:/user/code
+  TO {dest}/java.zip 
+  INCLUDE /*, *.java
+  EXCLUDE {temppat}    
+</pre>
+<p>
+Names of media (e.g. harddisks, USB sticks) are defined per default. For instance if a USB drive with the name "My USB" is mounted as drive "L:/" the drive letter or the drive name can be used:
+<pre>
+PROJECT
+  NAME example
+  TO {My USB}/backup/example.zip  # same as L:/backup/example.zip
+</pre>
+</p><p>
+Using drive names has the advantage that the backup is independent from the drive letter the drive gets mounted to. Useful to backup to USB sticks or portable harddisks that are automatically mounted to a drive letter that can vary depending on what other drives are mounted or which machine the project runs on.
+</p>
+
+
+<p><b>#</b> Line comment, e.g.
+<pre># This is a comment</pre></p>
+
+<p><b>Path</b> Paths can be written with forward or backward slashes regardless of the OS the software runs on.
+<pre>c:/backup/text.zip  =  c:\backup\text.zip  =  c:\backup/text.zip</pre></p>
+
+<p><b>Patterns</b> Patterns are slightly modified regular expressions. Certain symbols have been replaced to make typical patterns more readable: . -> ?, ? -> @, .* -> * and . -> \.
+with the last replacement disabling the dot pattern. Here some examples of patterns and their equivalent regular expressions:
+<pre>*.txt       =   .*\.txt         
+?+.xm?      =   .+\.xm.
+^[.~]*      =   ^[\.~].*
+*.te@mp     =   .*\.te?mp
+</pre></p>
+
+
+
+
+
+<!-- ================================================================================ -->
+<h1><a name="problems">known problems</a></h1>
+
+<p>None so far</p>
+
+
+
+
+<!-- ================================================================================ -->
+<h1><a name="history">history</a></h1>
+
+<br>
+<table border="1" width = "70%" >
+<tr><th>Version</th><th>Date</th><th>Comment</th></tr>
+<tr><td>1.00</td><td>18.01.11</td><td>First version of Zibble</td>
+</tr>
+</table>
+
+
+
+
+
+</body>
+</html>
+

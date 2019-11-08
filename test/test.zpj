@@ -1,0 +1,15 @@
+#VAR {dest} {USB 500GB}/backup/Work      
+VAR {dest} c:/Maet
+
+
+PROJECT
+  NAME test
+  RUN now
+  SIMULATE on
+  VERBOSE 1
+  COMPRESS 7
+  FROM ., c:/Maet/NoExisting
+  TO test.zip
+  INCLUDE *
+  EXCLUDE *.class, /.*, *.zip
+

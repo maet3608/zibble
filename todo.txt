@@ -1,0 +1,51 @@
+Files with path but on different drives cause conflict
+in zip file, eg.
+c:/data/test.dat
+d:/data/test.dat
+=> how to handle that
+=> is that is handled, files could also be stored without
+   path only by name
+
+
+
+Include ALWAYS requires pattern for folder even when
+only files in source folder are wanted, eg.
+PROJECT
+  NAME ZuluPad
+  FROM c:/Maet/Software/ZuluPadPro
+  TO {dest}/zulu.zip
+  INCLUDE /*, *.zulu    #/.* is needed!
+=> change or update docu
+
+Docu: 
+- Mention that patterns/filenames are case sensitive!
+- FAQ: list of error messages and meanings
+  - "Zip file must have at least one entry"
+  - File not fund
+  - case sensitve patterns/filenames
+  - parsing errors of projects file. How does error looks like  
+
+set thread priority to low
+
+ERROR should not stop archiving of other projects
+
+run individual projects from a projects file
+
+
+conditional vars
+VAR {dest} IF user.name = stefan THEN c:/stefan/backup ELSE c:/user
+  
+more system properties
+Java props:    http://www.devdaily.com/blog/post/java/print-all-java-system-properties
+computer/user name: http://stackoverflow.com/questions/473446/java-current-machine-name-and-logged-in-user
+              http://www.daniweb.com/forums/thread106301.html
+user home: http://stackoverflow.com/questions/473446/java-current-machine-name-and-logged-in-user
+   http://www.roseindia.net/java/java-get-example/java-get-user-home.shtml
+   
+   
+   
+error message when source or target folders do not exist
+=> update documentation   
+
+
+switch to enable/disable simplified regular expressions

@@ -1,0 +1,22 @@
+VAR {dest} c:/backup
+
+PROJECT
+  NAME text
+  FROM c:/user/text, d:/docs
+  TO {dest}/text.zip
+  INCLUDE /*, *.te@xt, *.doc
+  EXCLUDE /temp
+
+PROJECT
+  NAME code
+  FROM c:/user/projects
+  TO {dest}/code.zip
+  INCLUDE /*, *.java, *.py, *.scala
+  EXCLUDE /.svn, /.idea, *.zip, *.class, *.pyc
+  
+PROJECT
+  NAME pictures
+  FROM c:/user/pics, c:/clipart, c:/holidays/pictures
+  TO {dest}/pictures.zip
+  
+

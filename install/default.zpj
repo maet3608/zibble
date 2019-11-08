@@ -1,0 +1,13 @@
+VAR {dest} .
+
+PROJECT
+  NAME example
+  RUN now
+  SIMULATE on
+  VERBOSE 1
+  COMPRESS 9
+  FROM .
+  TO {dest}/example.zip
+  INCLUDE *
+  EXCLUDE *.zip, *.jar, *.log
+
